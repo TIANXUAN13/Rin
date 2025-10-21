@@ -51,5 +51,12 @@ jobs:
           RSS_DESCRIPTION: ${{ vars.RSS_DESCRIPTION }}
         run: |
           cd Rin/
+          
+          # 1. 安装项目所有依赖
           bun install --frozen-lockfile
-          bun scripts/migrator.ts
+          
+          # 2. 部署 Worker 代码 (Wrangler 会读取 wrangler.toml 并绑定到现有 D1 数据库)
+          wrangler deploy
+          
+          # 3. 将新的数据库结构变更应用到名为 'rin' 的 D1 数据库
+          wrangler d1 migrations apply rin
