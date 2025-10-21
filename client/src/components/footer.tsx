@@ -90,10 +90,8 @@ function Footer() {
                             </div>
                         </Popup>
                     </>}
+                    <a href="https://dash.cloudflare.com/" rel="noopener noreferrer" target="_blank">赛博菩萨</a>
                 </p>
-                <div>
-                    <a className='hover:underline' href="https://dash.cloudflare.com/" rel="noopener noreferrer" target="_blank">赛博菩萨</a>;
-                </div>
                 <div className="w-fit-content inline-flex rounded-full border border-zinc-200 p-[3px] dark:border-zinc-700">
                     <ThemeButton mode='light' current={modeState} label="Toggle light mode" icon="ri-sun-line" onClick={setMode} />
                     <ThemeButton mode='system' current={modeState} label="Toggle system mode" icon="ri-computer-line" onClick={setMode} />
