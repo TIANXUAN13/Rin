@@ -7,29 +7,51 @@ import { useTranslation } from "react-i18next";
 import { useLoginModal } from '../hooks/useLoginModal';
 
 type ThemeMode = 'light' | 'dark' | 'system';
+
 function Footer() {
-    const { t } = useTranslation()
+    const { t } = useTranslation();
     const [modeState, setModeState] = useState<ThemeMode>('system');
     const config = useContext(ClientConfigContext);
     const footerHtml = config.get<string>('footer');
     const loginEnabled = config.get<boolean>('login.enabled');
     const [doubleClickTimes, setDoubleClickTimes] = useState(0);
-    const { LoginModal, setIsOpened } = useLoginModal()
+    const { LoginModal, setIsOpened } = useLoginModal();
+
+    // ✅ 关键修复：使用 useEffect 动态加载 SDK
+    useEffect(() => {
+        // 检查是否已加载过 SDK
+        if (document.getElementById('jinrishici-sdk')) return;
+
+        const script = document.createElement('script');
+        script.id = 'jinrishici-sdk';
+        script.src = 'https://sdk.jinrishici.com/v2/browser/jinrishici.js';
+        script.charset = 'utf-8';
+        script.async = true;
+        
+        // 添加错误处理
+        script.onerror = () => {
+            console.error('今日诗词 SDK 加载失败');
+            const span = document.getElementById('jinrishici-sentence');
+            if (span) span.textContent = '今日诗词加载失败';
+        };
+
+        document.head.appendChild(script);
+    }, []);
+
     useEffect(() => {
         const mode = localStorage.getItem('theme') as ThemeMode || 'system';
         setModeState(mode);
         setMode(mode);
-    }, [])
+    }, []);
 
     const setMode = (mode: ThemeMode) => {
         setModeState(mode);
         localStorage.setItem('theme', mode);
 
-
         if (mode !== 'system' || (!('theme' in localStorage) && window.matchMedia(`(prefers-color-scheme: ${mode})`).matches)) {
             document.documentElement.setAttribute('data-color-mode', mode);
         } else {
-            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
             if (mediaQuery.matches) {
                 document.documentElement.setAttribute('data-color-mode', 'dark');
             } else {
@@ -47,18 +69,16 @@ function Footer() {
                 <link rel="alternate" type="application/json" title={siteName} href="/sub/rss.json" />
             </Helmet>
             <div className="flex flex-col mb-8 space-y-2 justify-center items-center t-primary ani-show">
-                <span id="jinrishici-sentence">正在加载今日诗词....</span>
-                <script src="https://sdk.jinrishici.com/v2/browser/jinrishici.js" charset="utf-8"></script>
                 {footerHtml && <div dangerouslySetInnerHTML={{ __html: footerHtml }} />}
                 <p className='text-sm text-neutral-500 font-normal link-line'>
                     <span onDoubleClick={() => {
-                        if(doubleClickTimes >= 2){ // actually need 3 times doubleClick
-                            setDoubleClickTimes(0)
-                            if(!loginEnabled) {
-                                setIsOpened(true)
+                        if (doubleClickTimes >= 2) {
+                            setDoubleClickTimes(0);
+                            if (!loginEnabled) {
+                                setIsOpened(true);
                             }
                         } else {
-                            setDoubleClickTimes(doubleClickTimes + 1)
+                            setDoubleClickTimes(doubleClickTimes + 1);
                         }
                     }}>
                         © {new Date().getFullYear()} Powered by <a className='hover:underline' href="https://github.com/openRin/Rin" target="_blank">Rin</a>
@@ -88,13 +108,15 @@ function Footer() {
                                         JSON
                                     </a>
                                 </p>
-
                             </div>
                         </Popup>
                     </>}
                     <a href="https://dash.cloudflare.com/" rel="noopener noreferrer" target="_blank">&nbsp;赛博菩萨</a>
                 </p>
+                
+                {/* ✅ 修复：将诗词占位符放在绿色框内 */}
                 <div className="w-fit-content inline-flex rounded-full border border-zinc-200 p-[3px] dark:border-zinc-700">
+                    <span id="jinrishici-sentence" className="px-2">正在加载今日诗词....</span>
                     <ThemeButton mode='light' current={modeState} label="Toggle light mode" icon="ri-sun-line" onClick={setMode} />
                     <ThemeButton mode='system' current={modeState} label="Toggle system mode" icon="ri-computer-line" onClick={setMode} />
                     <ThemeButton mode='dark' current={modeState} label="Toggle dark mode" icon="ri-moon-line" onClick={setMode} />
@@ -106,17 +128,16 @@ function Footer() {
 }
 
 function Spliter() {
-    return (<span className='px-1'>
-        |
-    </span>
-    )
+    return (<span className='px-1'>|</span>);
 }
 
 function ThemeButton({ current, mode, label, icon, onClick }: { current: ThemeMode, label: string, mode: ThemeMode, icon: string, onClick: (mode: ThemeMode) => void }) {
-    return (<button aria-label={label} type="button" onClick={() => onClick(mode)}
-        className={`rounded-inherit inline-flex h-[32px] w-[32px] items-center justify-center border-0 t-primary ${current === mode ? "bg-w rounded-full shadow-xl shadow-light" : ""}`}>
-        <i className={`${icon}`} />
-    </button>)
+    return (
+        <button aria-label={label} type="button" onClick={() => onClick(mode)}
+            className={`rounded-inherit inline-flex h-[32px] w-[32px] items-center justify-center border-0 t-primary ${current === mode ? "bg-w rounded-full shadow-xl shadow-light" : ""}`}>
+            <i className={`${icon}`} />
+        </button>
+    );
 }
 
 export default Footer;
