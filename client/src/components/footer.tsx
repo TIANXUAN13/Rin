@@ -70,6 +70,7 @@ function Footer() {
             </Helmet>
             <div className="flex flex-col mb-8 space-y-2 justify-center items-center t-primary ani-show">
                 {footerHtml && <div dangerouslySetInnerHTML={{ __html: footerHtml }} />}
+                <span id="jinrishici-sentence" className="px-2">正在加载今日诗词....</span>
                 <p className='text-sm text-neutral-500 font-normal link-line'>
                     <span onDoubleClick={() => {
                         if (doubleClickTimes >= 2) {
@@ -114,9 +115,8 @@ function Footer() {
                     <a href="https://dash.cloudflare.com/" rel="noopener noreferrer" target="_blank">&nbsp;赛博菩萨</a>
                 </p>
                 
-                {/* ✅ 修复：将诗词占位符放在绿色框内 */}
+                
                 <div className="w-fit-content inline-flex rounded-full border border-zinc-200 p-[3px] dark:border-zinc-700">
-                    <span id="jinrishici-sentence" className="px-2">正在加载今日诗词....</span>
                     <ThemeButton mode='light' current={modeState} label="Toggle light mode" icon="ri-sun-line" onClick={setMode} />
                     <ThemeButton mode='system' current={modeState} label="Toggle system mode" icon="ri-computer-line" onClick={setMode} />
                     <ThemeButton mode='dark' current={modeState} label="Toggle dark mode" icon="ri-moon-line" onClick={setMode} />
