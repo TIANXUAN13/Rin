@@ -118,7 +118,7 @@ function Footer() {
                             setDoubleClickTimes(doubleClickTimes + 1)
                         }
                     }}>
-                        © {new Date().getFullYear()} Powered by <a className='hover:underline' href="https://github.com/openRin/Rin" target="_blank">Rin｜赛博大善人cloudflare</a>
+                        © {new Date().getFullYear()} Powered by <a className='hover:underline' href="https://github.com/openRin/Rin" target="_blank">Rin</a>｜ <a className='hover:underline' href="https://www.cloudflare.com/" target="_blank">赛博大善人cloudflare</a>
                     </span>
                     {config.getBoolean('rss') && <>
                         <Spliter />
