@@ -18,6 +18,17 @@ function Footer() {
     const mountedScriptNodesRef = useRef<HTMLScriptElement[]>([]);
     const loginEnabled = config.getBoolean('login.enabled');
     const [doubleClickTimes, setDoubleClickTimes] = useState(0);
+    const [poem, setPoem] = useState<{ content: string; author: string; works: string } | null>(null);
+    useEffect(() => {
+        fetch('https://api.qhsou.com/api/gsc.php')
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    setPoem(data.data);
+                }
+            })
+            .catch(() => {});
+    }, []);
     useEffect(() => {
         const mode = localStorage.getItem('theme') as ThemeMode || 'system';
         setModeState(mode);
@@ -91,6 +102,11 @@ function Footer() {
             </Helmet>
             <div className="flex flex-col mb-8 space-y-2 justify-center items-center t-primary ani-show">
                 <div ref={footerHtmlRef} />
+                {poem && (
+                    <p className='text-sm text-neutral-500 font-normal text-center px-4'>
+                        「{poem.content}」—— {poem.author}《{poem.works}》
+                    </p>
+                )}
                 <p className='text-sm text-neutral-500 font-normal link-line'>
                     <span onDoubleClick={() => {
                         if(doubleClickTimes >= 2){ // actually need 3 times doubleClick
@@ -102,7 +118,7 @@ function Footer() {
                             setDoubleClickTimes(doubleClickTimes + 1)
                         }
                     }}>
-                        © {new Date().getFullYear()} Powered by <a className='hover:underline' href="https://github.com/openRin/Rin" target="_blank">Rin</a>
+                        © {new Date().getFullYear()} Powered by <a className='hover:underline' href="https://github.com/openRin/Rin" target="_blank">Rin｜赛博大善人cloudflare</a>
                     </span>
                     {config.getBoolean('rss') && <>
                         <Spliter />
