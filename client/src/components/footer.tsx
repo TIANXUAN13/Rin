@@ -19,12 +19,28 @@ function Footer() {
     const loginEnabled = config.getBoolean('login.enabled');
     const [doubleClickTimes, setDoubleClickTimes] = useState(0);
     const [poem, setPoem] = useState<{ content: string; author: string; works: string } | null>(null);
+    const CACHE_KEY = 'poem_cache';
+    const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
     useEffect(() => {
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (cached) {
+            try {
+                const { poem: cachedPoem, timestamp } = JSON.parse(cached);
+                if (Date.now() - timestamp < CACHE_DURATION) {
+                    setPoem(cachedPoem);
+                    return;
+                }
+            } catch {}
+        }
         fetch('https://api.qhsou.com/api/gsc.php')
             .then(res => res.json())
             .then(data => {
                 if (data.status === 'success') {
                     setPoem(data.data);
+                    localStorage.setItem(CACHE_KEY, JSON.stringify({
+                        poem: data.data,
+                        timestamp: Date.now(),
+                    }));
                 }
             })
             .catch(() => {});
